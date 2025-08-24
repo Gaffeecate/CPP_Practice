@@ -2,57 +2,68 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <set>
 #include <algorithm>
-
 using namespace std;
 
 
-vector<string> genres = { "classic", "pop", "classic", "classic", "pop" };
-vector<int> plays = { 500, 600, 150, 800, 2500 };
-vector<int> solution(vector<string> genres, vector<int> plays);
-
-int main()
-{
-    solution(genres, plays); // 호출
-    return 0;
-}
-
-vector<int> solution(vector<string> genres, vector<int> plays) {
-    map <string, int> mapGenreCount;
-    set <string> setGenre;
-    for (string str : genres) {
-        mapGenreCount[str]++;
-        setGenre.insert(str);
+struct GenresComparator {
+    bool operator()(const pair<string, int>& a, const pair<string, int>& b) const {
+        return a.second > b.second; 
     }
-     
-    vector<pair<string, int>> countAndName = {};
+};
 
-    for (string str : setGenre) {
-        countAndName.push_back(make_pair(str, mapGenreCount[str]));
+struct SongsComparator {
+    bool operator()(const pair<string, int>& a, const pair<string, int>& b) const {
+        if (a.first != b.first) {
+            return a.first > b.first;
+        }
+        return a.second > b.second;
+    }
+};
+
+int main() {
+    vector<string> genres = { "classic", "pop", "classic", "classic", "pop" };
+    vector<int> plays = { 500, 600, 150, 800, 2500 };
+
+    map <string, int> totalGenresCount;
+    // 1. 일단 장르별 총 재생횟수 정리
+    for (int i = 0; i < genres.size(); i++) {
+        totalGenresCount[genres[i]] = plays[i];
     }
 
+    // map을 vector로 복사
+    vector <pair<string, int>> sortedGenresVec;
+    map <string, int> ::iterator it;
+    for (it = totalGenresCount.begin(); it != totalGenresCount.end(); it++) {
+        sortedGenresVec.push_back(*it);
+    }
+    sort(sortedGenresVec.begin(), sortedGenresVec.end(), GenresComparator()); // 자 이제 장르별 플레이 횟수대로 정렬됐고
 
-    
-    sort(countAndName.begin(), countAndName.end(),
-        [](const pair<string, int>& a, const pair<string, int>& b) {
-            return a.second > b.second;
-        });
+    map<string, vector<pair<int, int> > > bucket;
+    for (int i = 0; i < genres.size(); i++) {
+        bucket[genres[i]].push_back(pair<int, int>(plays[i], i));
+    }
 
+    // 4. 각 장르 내에서 재생횟수로 정렬
+    map<string, vector<pair<int, int>>>::iterator bucketIt; // 장르, 플레이횟수, 인덱스
+    for (bucketIt = bucket.begin(); bucketIt != bucket.end(); ++bucketIt) {
+        sort(bucketIt->second.begin(), bucketIt->second.end(), SongsComparator());
+    }
 
-   
-
-
-
-
-
-
-    // 장르빈도수 맵 -> 맵은 키값으로 정렬됨 -> 밸류값으로 다시 정렬 필요 -> 이걸 모르니 그냥 스트링으로 합쳐
-    // -> 어떻게 하냐면, 밸류-키값을 순회하면서 플레이횟수를 스트링으로 바꾼 다음에 장르와 합침 -> 정렬
-    // -> 정렬됐으면 장르별로 플레이 회수가 정렬됨 classic500 이렇게.
-    // 장르마다의 맵 -> {플레이횟수, 인덱스}
-
-
-
-    return plays;
+    vector<int> result = {};
+    string  genresStr;
+    for (int i = 0; i < sortedGenresVec.size(); i++) {
+        genresStr = (sortedGenresVec[i].first);
+        if (bucket[genresStr].size() >= 2) {
+            result.push_back(bucket[genresStr][0].second);
+            result.push_back(bucket[genresStr][1].second);
+        }
+        else if (bucket[genresStr].size() == 1) {
+            result.push_back(bucket[genresStr][0].second);
+        }
+        else {
+            continue;
+        }
+    }
+    return result;
 }
