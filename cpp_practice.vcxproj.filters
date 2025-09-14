@@ -21,6 +21,12 @@
     <ClCompile Include="Phonebook.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="BestAlbum.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedList.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Memory.txt" />

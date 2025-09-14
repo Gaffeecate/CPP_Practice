@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="BestAlbum.cpp" />
     <ClCompile Include="cpp_practice.cpp" />
+    <ClCompile Include="LinkedList.cpp" />
     <ClCompile Include="Phonebook.cpp" />
   </ItemGroup>
   <ItemGroup>
